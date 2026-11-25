@@ -129,7 +129,11 @@ def fetch_one(cid):
     i = items(call("detailIntro2", contentId=cid, contentTypeId=32))
     if not i:
         return {}
-    return {short: (i[0].get(long, "") or "").strip() for long, short in INTRO_KEYS.items() if (i[0].get(long, "") or "").strip()}
+    d = {short: (i[0].get(long, "") or "").strip() for long, short in INTRO_KEYS.items() if (i[0].get(long, "") or "").strip()}
+    for k, v in i[0].items():   # v2 필드명이 v1과 다를 수 있어 매핑 밖 필드도 원래 이름으로 보관(빌더 매핑 점검용)
+        if k not in INTRO_KEYS and k not in ("contentid", "contenttypeid") and isinstance(v, str) and v.strip():
+            d["x_" + k] = v.strip()
+    return d
 
 
 def main():
